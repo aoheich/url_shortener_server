@@ -19,7 +19,7 @@ export const getUrlController = async (req: Request<{shortCode: string}>, res: R
 
     const url = await getUrl(req.params.shortCode); 
 
-    res.redirect(302,url.originalUrl);
+    res.redirect(302,url);
 }
 
 export const deleteUrlController = async (req: Request<{shortCode: string}>, res: Response<{message: string}>, next: NextFunction) => {

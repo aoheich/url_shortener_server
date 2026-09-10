@@ -5,12 +5,9 @@ export const redisClient = createClient({
     url: process.env.REDIS_URL!,
     socket: {
         reconnectStrategy(retries) {
-            if(retries >= 3) {
-                return new Error("Redis connection failed after 3 retries, giving up")
-            } 
-
+        
             console.log(`Redis connection retry ${retries}`)
-            return 1000
+            return 5000
         },
     }
 }) 
@@ -28,3 +25,8 @@ redisClient.on("error", (err) => {
     console.error(`Redis client error:`, err)
 })
 
+try {
+    await redisClient.connect()
+} catch (error) {
+    console.error("Error connecting to Redis:", error)
+}
