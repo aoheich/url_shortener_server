@@ -24,5 +24,10 @@ export const setCache = async (key: string, value: string) => {
 }
 
 export const deleteCache = async (key: string) => {
-    return await redisClient.del(key);
+    try {
+        await redisClient.del(key);
+        return 1
+    } catch (error) {
+        return null
+    }
 }
