@@ -1,0 +1,158 @@
+# url-shortener-server
+
+## Overview
+
+This project helps teams create short, manageable links from long web addresses. It takes standard user input, generates a unique compact code, and handles the redirection when visitors access the new link. Built-in safeguards protect the service from abuse by restricting excessive request volumes.
+
+## Installation
+
+Follow these steps to set up the project locally on your machine.
+
+Clone the Repository:
+```bash
+git clone https://github.com/aoheich/url_shortener_server.git
+```
+
+Navigate into the directory and install dependencies:
+```bash
+cd url_shortener_server
+npm install
+```
+
+Set up your database schema and start the development server:
+```bash
+npx prisma generate
+npx prisma db push
+npm run start
+```
+
+## Usage
+
+You can interact with the service using standard HTTP requests. Here is an example of creating a short link using curl:
+
+```bash
+curl -X POST http://localhost:3000/api/urls \
+  -H "Content-Type: application/json" \
+  -d '{"originalUrl": "https://www.example.com/very/long/path/to/resource"}'
+```
+
+The server will process the request and return a JSON response containing the new short code:
+
+```json
+{
+  "message": "URL created successfully",
+  "data": {
+    "shortCode": "a1b2c"
+  }
+}
+```
+
+## Features
+
+* Link Generation: Converts long web addresses into unique 5-character short codes for easy sharing.
+* High-Performance Redirection: Caches frequently accessed links in memory to ensure extremely fast response times.
+* Traffic Management: Implements IP-based rate limiting to restrict users from generating excessive requests.
+* Data Validation: Enforces strict input validation to ensure all submitted data is properly formatted before processing.
+
+## Technologies Used
+
+| Technology | Purpose |
+| :--- | :--- |
+| Node.js | Runtime environment |
+| Express | Web framework |
+| TypeScript | Type-safe programming language |
+| Prisma | Object-Relational Mapping |
+| MariaDB | Relational database |
+| Redis | In-memory data store for caching and rate limiting |
+| Vitest | Testing framework |
+
+## Environment Variables
+
+You will need the following environment variables to run this project successfully. Create a `.env` file in the root directory and add the following keys. 
+
+```env
+PORT=3000
+DATABASE_URL="mysql://username:password@localhost:3306/database_name"
+REDIS_URL="redis://localhost:6379"
+```
+
+## API Documentation
+
+#### POST /api/urls
+**Description**: Creates a new short code for a provided original URL.
+
+**Request**:
+```json
+{
+  "originalUrl": "https://www.example.com"
+}
+```
+
+**Response**:
+```json
+{
+  "message": "URL created successfully",
+  "data": {
+    "shortCode": "x8f9a"
+  }
+}
+```
+
+**Errors**:
+* 400: Validation error (missing originalUrl, invalid URL format, or URL exceeds 2048 characters)
+* 500: Internal Server Error
+
+#### GET /api/urls/:shortCode
+**Description**: Retrieves the original URL from the cache or database and redirects the client to it.
+
+**Request**:
+Empty body. The required parameter `shortCode` is passed directly in the URL path.
+
+**Response**:
+```txt
+HTTP/1.1 302 Found
+Location: https://www.example.com
+```
+
+**Errors**:
+* 400: Validation error (shortCode must be exactly 5 characters)
+* 404: URL not found
+* 429: Too many requests, please try again later
+* 500: Internal Server Error
+
+#### DELETE /api/urls/:shortCode
+**Description**: Removes the short link from the database and clears the corresponding entry from the cache.
+
+**Request**:
+Empty body. The required parameter `shortCode` is passed directly in the URL path.
+
+**Response**:
+```json
+{
+  "message": "URL deleted successfully"
+}
+```
+
+**Errors**:
+* 400: Validation error (shortCode must be exactly 5 characters)
+* 404: URL not found
+* 500: Internal Server Error
+
+## Contributing
+
+We welcome contributions to improve this project. Please create an issue to discuss any proposed changes before submitting a pull request. Ensure that all tests pass and that your code adheres to the existing architectural patterns.
+
+## Author Info
+
+* GitHub: [aoheich](https://github.com/aoheich)
+
+---
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)](https://mariadb.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+
+[![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://dokugen.samueltuoyo.com)
